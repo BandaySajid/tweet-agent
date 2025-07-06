@@ -34,6 +34,7 @@ export interface LegacyUserRaw {
   has_extended_profile?: boolean;
   url?: string;
   can_dm?: boolean;
+  following?: boolean;
 }
 
 /**
@@ -64,7 +65,7 @@ export interface Profile {
   username?: string;
   website?: string;
   canDm?: boolean;
-  followingUser?: boolean;
+  following?: boolean;
 }
 
 export interface UserRaw {
@@ -74,9 +75,6 @@ export interface UserRaw {
         rest_id?: string;
         is_blue_verified?: boolean;
         legacy: LegacyUserRaw;
-        relationship_perspectives?: {
-          following?: boolean;
-        };
       };
     };
   };
@@ -90,7 +88,6 @@ function getAvatarOriginalSizeUrl(avatarUrl: string | undefined) {
 export function parseProfile(
   user: LegacyUserRaw,
   isBlueVerified?: boolean,
-  followingUser?: boolean
 ): Profile {
   const profile: Profile = {
     avatar: getAvatarOriginalSizeUrl(user.profile_image_url_https),
@@ -113,7 +110,7 @@ export function parseProfile(
     username: user.screen_name,
     isBlueVerified: isBlueVerified ?? false,
     canDm: user.can_dm,
-    followingUser: followingUser ?? false,
+    following: user.following ?? false,
   };
 
   if (user.created_at != null) {
@@ -203,7 +200,7 @@ export async function getProfile(
 
   return {
     success: true,
-    value: parseProfile(user.legacy, user.is_blue_verified, user.relationship_perspectives?.following),
+    value: parseProfile(user.legacy, user.is_blue_verified),
   };
 }
 
